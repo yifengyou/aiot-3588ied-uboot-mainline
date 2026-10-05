@@ -24,15 +24,17 @@ sed -i "s#AIoT 3588IED Compiled By yifengyou.*#AIoT 3588IED Compiled By yifengyo
 cd "$WORKDIR"
 rm -rf output
 mkdir -p output
+cd rkbin
+./tools/boot_merger `pwd`/RKBOOT/RK3588MINIALL.ini
+cp -a rk3588_spl_loader_v1.21.114.bin ${WORKDIR}/output/rk3588_spl_loader_v1.21.114.bin
 
 cd "$WORKDIR"
 make mrproper
 make "$DEFCONFIG"
 make -j"$JOBS"
 
-cp -a idbloader.img ${WORKDIR}/output/idbloader.img
-cp -a u-boot.itb ${WORKDIR}/output/uboot.img
-cp -a u-boot.itb ${WORKDIR}/output/uboot_${TIMESTAMP}.img
+cp -a u-boot-rockchip.bin ${WORKDIR}/output/uboot.img
+cp -a u-boot-rockchip.bin ${WORKDIR}/output/uboot_${TIMESTAMP}.img
 
 ls -alh   output/
 ls -alh   dts/upstream/src/arm64/rockchip/rk3588-aiot-3588ied.dts
