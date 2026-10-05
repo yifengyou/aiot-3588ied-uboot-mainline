@@ -577,9 +577,7 @@ int spl_init(void)
 
 __weak void board_boot_order(u32 *spl_boot_list)
 {
-	// spl_boot_list[0] = spl_boot_device();
-	spl_boot_list[0] = BOOT_DEVICE_SPI;
-	spl_boot_list[1] = BOOT_DEVICE_NONE;
+	spl_boot_list[0] = spl_boot_device();
 }
 
 __weak int spl_check_board_image(struct spl_image_info *spl_image,
@@ -635,9 +633,6 @@ static int boot_from_devices(struct spl_image_info *spl_image,
 	int ret = -ENODEV;
 	int i;
 
-	spl_boot_list[0] = BOOT_DEVICE_SPI;
-	spl_boot_list[1] = BOOT_DEVICE_NONE;
-
 	for (i = 0; i < count && spl_boot_list[i] != BOOT_DEVICE_NONE; i++) {
 		struct spl_image_loader *loader;
 		int bootdev = spl_boot_list[i];
@@ -648,7 +643,7 @@ static int boot_from_devices(struct spl_image_info *spl_image,
 			if (loader && bootdev != loader->boot_device)
 				continue;
 			if (!CONFIG_IS_ENABLED(SILENT_CONSOLE)) {
-				printf("kdev Trying to boot from %s\n",
+				printf("Trying to boot from %s\n",
 				       spl_loader_name(loader));
 			}
 
@@ -758,9 +753,6 @@ void board_init_r(gd_t *dummy1, ulong dummy2)
 		spl_image.arg = (void *)SPL_PAYLOAD_ARGS_ADDR;
 	spl_image.boot_device = BOOT_DEVICE_NONE;
 	board_boot_order(spl_boot_list);
-
-	spl_boot_list[0] = BOOT_DEVICE_SPI;
-	spl_boot_list[1] = BOOT_DEVICE_NONE;
 
 	ret = boot_from_devices(&spl_image, spl_boot_list,
 				ARRAY_SIZE(spl_boot_list));
