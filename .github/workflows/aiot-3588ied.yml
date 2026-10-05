@@ -1,0 +1,91 @@
+name: AIoT 3588IED Uboot Build
+
+on:
+  push:
+    branches:
+      - aiot-3588ied
+  repository_dispatch:
+  workflow_dispatch:
+
+env:
+  TZ: Asia/Shanghai
+  ACTIONS_STEP_DEBUG: true
+
+jobs:
+  build-uboot:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show environment
+        id: basic_info
+        run: |
+          nproc
+          uname -a
+          cat /etc/*release
+          free -h
+          mount
+          df -h
+          cat /proc/cpuinfo
+          cat /proc/meminfo
+
+      - name: Create simulated physical disk
+        run: |
+          mnt_size=$(expr $(df -h /mnt | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 1)
+          root_size=$(expr $(df -h / | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 4)
+          sudo truncate -s "${mnt_size}"G /mnt/mnt.img
+          sudo truncate -s "${root_size}"G /root.img
+          sudo losetup /dev/loop6 /mnt/mnt.img
+          sudo losetup /dev/loop7 /root.img
+          sudo pvcreate /dev/loop6
+          sudo pvcreate /dev/loop7
+          sudo vgcreate github /dev/loop6 /dev/loop7
+          sudo lvcreate -n runner -l 100%FREE github
+          sudo mkfs.xfs /dev/github/runner
+          sudo mkdir -p /builder
+          sudo mount /dev/github/runner /builder
+          sudo chown -R runner.runner /builder
+          sudo apt-get update
+          sudo apt-get install -y device-tree-compiler zip u-boot-tools libgnutls28-dev \
+            git make gcc-aarch64-linux-gnu \
+            device-tree-compiler python3 python3-pip \
+            bison flex libssl-dev libncurses-dev \
+            swig python3-pyelftools uuid-dev libgnutls28-dev
+          df -Th
+
+      - name: Run UBoot Build in Ubuntu 22.04 container
+        working-directory: /builder
+        run: |
+          pwd
+          sudo /bin/cp -a ${{ github.workspace }}/* .
+          ls -alh
+          ./kdev-build.sh
+
+          sudo mkdir -p /builder/release
+          sudo cp output/* /builder/release
+
+      - name: List build output
+        run: |
+          ls -alh  /builder/release/*
+          md5sum /builder/release/*
+
+      - name: Upload UBOOT to Release
+        uses: ncipollo/release-action@main
+        with:
+          tag: aiot-3588ied-uboot
+          artifacts: /builder/release/*
+          allowUpdates: true
+          removeArtifacts: true
+          replacesArtifacts: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body: |
+            # AIoT 3588IED UBoot 镜像(基于UBoot Mainline v2026.10)
+            #
+            ## 免责声明
+
+            - **按原样提供**：本镜像不作任何明示或暗示的保证，使用风险由用户自行承担。
+            - **无官方关联**：本项目与 Rockchip、视美泰 任何商业实体无关，为非盈利自由分享。
+            - **安全提示**：部署后请及时更新安全补丁、修改默认密码、配置防火墙及访问控制策略。
+
