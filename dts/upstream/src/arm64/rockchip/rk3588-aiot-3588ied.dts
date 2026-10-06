@@ -10,7 +10,7 @@
  * references merged into a single file. The original nanopc-t6.dtsi
  * is not included.
  *
- * AIoT 3588IED Compiled By yifengyou v2026.10.06-15:14:53";
+ * AIoT 3588IED Compiled By yifengyou v2026.10.06-15:25:42";
  */
 
 /dts-v1/;
@@ -24,12 +24,13 @@
 #include "rk3588.dtsi"
 
 / {
-	model = "AIoT 3588IED Compiled By yifengyou v2026.10.06-15:14:53";
+	model = "AIoT 3588IED Compiled By yifengyou v2026.10.06-15:25:42";
 	compatible = "rockchip,rk3588-aiot-3588ied", "rockchip,rk3588";
 
 	aliases {
 		mmc0 = &sdhci;
 		mmc1 = &sdmmc;
+		mmc2 = &sdio;
 		ethernet0 = &gmac1;
 	};
 
@@ -809,6 +810,20 @@
 	max-frequency = <200000000>;
 	mmc-hs400-1_8v;
 	mmc-hs400-enhanced-strobe;
+	status = "okay";
+};
+
+&sdio {
+	bus-width = <4>;
+	non-removable;
+	no-sdio;
+	no-sd;
+	cap-mmc-highspeed;
+	mmc-ddr-1_8v;
+	mmc-hs400-1_8v;
+	max-frequency = <150000000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&sdiom0_pins>;
 	status = "okay";
 };
 
