@@ -49,6 +49,7 @@ obj-$(CONFIG_WDT_SBSA) += sbsa_gwdt.o
 obj-$(CONFIG_WDT_K3_RTI) += rti_wdt.o
 obj-$(CONFIG_WDT_SIEMENS_PMIC) += siemens_pmic_wdt.o
 obj-$(CONFIG_WDT_SL28CPLD) += sl28cpld-wdt.o
+obj-$(CONFIG_WDT_SMDT) += smdt_wdt.o
 obj-$(CONFIG_WDT_SP805) += sp805_wdt.o
 obj-$(CONFIG_WDT_STARFIVE) += starfive_wdt.o
 obj-$(CONFIG_WDT_STM32MP) += stm32mp_wdt.o

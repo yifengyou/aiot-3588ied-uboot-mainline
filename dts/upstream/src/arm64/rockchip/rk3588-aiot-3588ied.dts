@@ -10,7 +10,7 @@
  * references merged into a single file. The original nanopc-t6.dtsi
  * is not included.
  *
- * AIoT 3588IED Compiled By yifengyou v2026.10.07-01:49:12";
+ * AIoT 3588IED Compiled By yifengyou v2026.10.07-22:12:33";
  */
 
 /dts-v1/;
@@ -24,7 +24,7 @@
 #include "rk3588.dtsi"
 
 / {
-	model = "AIoT 3588IED Compiled By yifengyou v2026.10.07-01:49:12";
+	model = "AIoT 3588IED Compiled By yifengyou v2026.10.07-22:12:33";
 	compatible = "rockchip,rk3588-aiot-3588ied", "rockchip,rk3588";
 
 	aliases {
@@ -552,6 +552,14 @@
 		interrupt-parent = <&gpio0>;
 		interrupts = <RK_PB0 IRQ_TYPE_LEVEL_LOW>;
 		wakeup-source;
+	};
+
+	smdt_wdt: watchdog@62 {
+		compatible = "smdt,mcu-wdt";
+		reg = <0x62>;
+		timeout-sec = <60>;
+		hw_margin_ms = <24000>;
+		u-boot,autostart;
 	};
 };
 

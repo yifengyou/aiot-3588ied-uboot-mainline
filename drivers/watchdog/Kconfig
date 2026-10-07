@@ -71,6 +71,16 @@ config ULP_WATCHDOG
 	help
 	  Say Y here to enable i.MX7ULP watchdog driver.
 
+config WDT_SMDT
+	bool "SMDT MCU I2C watchdog timer support"
+	depends on WDT && DM_I2C
+	imply WATCHDOG
+	help
+	  Enable support for the SMDT MCU watchdog connected via I2C.
+	  The MCU is typically at I2C address 0x62. The watchdog is
+	  enabled by writing to register 0x32 and fed by writing 0xab
+	  to register 0x33.
+
 config DESIGNWARE_WATCHDOG
 	bool "Designware watchdog timer support"
 	depends on WDT
