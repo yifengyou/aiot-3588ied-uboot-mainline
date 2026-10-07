@@ -10,7 +10,7 @@
  * references merged into a single file. The original nanopc-t6.dtsi
  * is not included.
  *
- * AIoT 3588IED Compiled By yifengyou v2026.10.06-15:25:42";
+ * AIoT 3588IED Compiled By yifengyou v2026.10.07-01:49:12";
  */
 
 /dts-v1/;
@@ -24,7 +24,7 @@
 #include "rk3588.dtsi"
 
 / {
-	model = "AIoT 3588IED Compiled By yifengyou v2026.10.06-15:25:42";
+	model = "AIoT 3588IED Compiled By yifengyou v2026.10.07-01:49:12";
 	compatible = "rockchip,rk3588-aiot-3588ied", "rockchip,rk3588";
 
 	aliases {
@@ -1182,6 +1182,10 @@
 };
 
 &tsadc {
+	status = "okay";
+};
+
+&wdt {
 	status = "okay";
 };
 

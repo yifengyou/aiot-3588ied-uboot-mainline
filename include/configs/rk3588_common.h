@@ -38,12 +38,7 @@
        "button_cmd_0_name=Recovery key\0" \
        "button_cmd_0=run bootcmd_recovery\0" \
        "bootcmd_recovery=" \
-               "sf probe 0;" \
-               "sf read 0x40000000 0x0 0x2000000;" \
-               "blkmap create spidisk;" \
-               "blkmap map spidisk 0 0x10000 mem 0x40000000;" \
-               "part list blkmap 0;" \
-               "sysboot blkmap 0:2 any ${scriptaddr} /recovery.conf;\0" \
+               "sysboot mmc 0:2 any ${scriptaddr} /recovery.conf;\0" \
 	"try_bootscr_boot=" \
 		"for distro_bootpart in 1 2 3 4 8 5 6 7 9; do " \
 			"for prefix in / /boot/; do " \
