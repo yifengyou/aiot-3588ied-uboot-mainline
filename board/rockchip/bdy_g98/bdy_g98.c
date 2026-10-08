@@ -6,33 +6,28 @@
  * (I2C bus 6, address 0x20) to ensure that USB host power (GPIO 0)
  * and PCIe reset (GPIO 15) are in a known good state.
  *
- * The NCA9555 (Novosense, PCA9555-compatible) does not reset its pins
- * when the board is only partially powered down (e.g. Type-C still
- * connected).  On the next 12V power-up the pins retain their previous
- * values, which can leave USB and M.2 peripherals unpowered.  By
- * explicitly configuring the expander here we guarantee a clean state
- * regardless of the previous power cycle.
+ * NCA9555 GPIO assignments (from factory DTS boot.dts):
+ *   GPIO 0  - usb0_power  (ACTIVE HIGH: HIGH=ON, LOW=OFF)
+ *   GPIO 1  - led4
+ *   GPIO 4  - led3
+ *   GPIO 6  - breathe_led
+ *   GPIO 7  - led2
+ *   GPIO 8  - led1
+ *   GPIO 9  - io1
+ *   GPIO 10 - io2
+ *   GPIO 11 - io3
+ *   GPIO 12 - io4
+ *   GPIO 14 - hp-con (headphone)
+ *   GPIO 15 - PCIe reset (ACTIVE HIGH: HIGH=asserted)
  *
- * Key design decision: we use raw bus-level I2C transfers
- * (i2c_get_ops(bus)->xfer) instead of i2c_get_chip() + dm_i2c_read/write().
- * This is because i2c_get_chip() calls device_probe() on the child node,
- * which—when the DTS node has compatible="nxp,pca9555"—triggers
- * pca953x_probe().  That probe does I2C register reads that can fail
- * if the I2C bus is not yet stable, permanently marking the DM device
- * as failed (-EREMOTEIO).  Once failed, no subsequent retry can recover
- * it, and the pca953x GPIO controller becomes unavailable for PCIe
- * reset-gpios.
+ * We use raw bus-level I2C transfers (i2c_get_ops(bus)->xfer) instead
+ * of i2c_get_chip() + dm_i2c_read/write() to avoid triggering
+ * pca953x_probe() during early init.  The pca953x driver will later be
+ * probed by the DM framework when the PCIe driver calls
+ * gpio_request_by_name("reset-gpios").
  *
- * By doing raw bus-level transfers we avoid device_probe() entirely.
- * The pca953x driver will later be probed by the DM framework when the
- * PCIe driver calls gpio_request_by_name("reset-gpios"), at which point
- * the I2C bus is fully stable and the probe succeeds.
- *
- * We run in misc_init_r() rather than board_init() because the I2C bus
- * is not ready for data transfers during board_init() — the controller
- * probes but actual I2C transactions return -EREMOTEIO (-121).
- * misc_init_r() runs much later in the init sequence, after all DM
- * devices have been fully initialised and the I2C bus is stable.
+ * We run in misc_init_r() because the I2C bus is not ready for data
+ * transactions during board_init().
  */
 
 #include <stdio.h>
@@ -220,23 +215,21 @@ static int nca9555_early_init(void)
 			goto retry;
 		printf("NCA9555: Output Port 0 before: 0x%02x\n", val);
 
-		val |= BIT(0);
-		val |= BIT(1);
-		val |= BIT(7);
+		val &= ~BIT(NCA9555_GPIO_USB_POWER);
 		ret = nca9555_write(NCA9555_REG_OUT0, val);
 		if (ret)
 			goto retry;
 		printf("NCA9555: USB power OFF (Output Port 0: 0x%02x)\n", val);
 
-		udelay(100000);
+		udelay(200000);
 
-		val &= ~BIT(0);
-		val &= ~BIT(1);
-		val &= ~BIT(7);
+		val |= BIT(NCA9555_GPIO_USB_POWER);
 		ret = nca9555_write(NCA9555_REG_OUT0, val);
 		if (ret)
 			goto retry;
 		printf("NCA9555: USB power ON  (Output Port 0: 0x%02x)\n", val);
+
+		udelay(50000);
 
 		ret = nca9555_read(NCA9555_REG_OUT1, &val);
 		if (ret)
@@ -253,14 +246,12 @@ static int nca9555_early_init(void)
 		if (ret)
 			goto retry;
 		printf("NCA9555: Config Port 0 before: 0x%02x\n", val);
-		val &= ~BIT(0);
-		val &= ~BIT(1);
-		val &= ~BIT(7);
+		val &= ~BIT(NCA9555_GPIO_USB_POWER);
 		ret = nca9555_write(NCA9555_REG_CFG0, val);
 		if (ret)
 			goto retry;
-		printf("NCA9555: Config Port 0 after:  0x%02x  (GPIO 0,1,7 = output)\n",
-		       val);
+		printf("NCA9555: Config Port 0 after:  0x%02x  (GPIO %d = output)\n",
+		       val, NCA9555_GPIO_USB_POWER);
 
 		ret = nca9555_read(NCA9555_REG_CFG1, &val);
 		if (ret)
