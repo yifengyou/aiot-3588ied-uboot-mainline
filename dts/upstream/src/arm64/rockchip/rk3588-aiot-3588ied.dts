@@ -10,7 +10,7 @@
  * references merged into a single file. The original nanopc-t6.dtsi
  * is not included.
  *
- * AIoT 3588IED Compiled By yifengyou v2026.10.08-20:43:15";
+ * AIoT 3588IED Compiled By yifengyou v2026.10.08-23:03:52";
  */
 
 /dts-v1/;
@@ -24,7 +24,7 @@
 #include "rk3588.dtsi"
 
 / {
-	model = "AIoT 3588IED Compiled By yifengyou v2026.10.08-20:43:15";
+	model = "AIoT 3588IED Compiled By yifengyou v2026.10.08-23:03:52";
 	compatible = "rockchip,rk3588-aiot-3588ied", "rockchip,rk3588";
 
 	aliases {
@@ -214,42 +214,15 @@
 
 	vbus5v0_typec: regulator-vbus5v0-typec {
 		compatible = "regulator-fixed";
-		enable-active-high;
-		gpio = <&gpio4 RK_PA1 GPIO_ACTIVE_HIGH>;
 		regulator-name = "vbus5v0_typec";
 		regulator-min-microvolt = <5000000>;
 		regulator-max-microvolt = <5000000>;
-		vin-supply = <&vcc5v0_host>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&typec5v_pwren>;
+		vin-supply = <&vcc5v0_sys>;
 	};
 
 	vcc5v0_host: regulator-vcc5v0-host {
 		compatible = "regulator-fixed";
-		gpio = <&nca9555 0 GPIO_ACTIVE_LOW>;
 		regulator-name = "vcc5v0_host";
-		regulator-always-on;
-		regulator-boot-on;
-		regulator-min-microvolt = <5000000>;
-		regulator-max-microvolt = <5000000>;
-		vin-supply = <&vcc5v0_peripherals>;
-	};
-
-	vcc5v0_usb1: regulator-vcc5v0-usb1 {
-		compatible = "regulator-fixed";
-		gpio = <&nca9555 7 GPIO_ACTIVE_LOW>;
-		regulator-name = "vcc5v0_usb1";
-		regulator-always-on;
-		regulator-boot-on;
-		regulator-min-microvolt = <5000000>;
-		regulator-max-microvolt = <5000000>;
-		vin-supply = <&vcc5v0_peripherals>;
-	};
-
-	vcc5v0_usb2: regulator-vcc5v0-usb2 {
-		compatible = "regulator-fixed";
-		gpio = <&nca9555 1 GPIO_ACTIVE_LOW>;
-		regulator-name = "vcc5v0_usb2";
 		regulator-always-on;
 		regulator-boot-on;
 		regulator-min-microvolt = <5000000>;
@@ -267,7 +240,7 @@
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 		startup-delay-us = <5000>;
-		vin-supply = <&vcc5v0_sys>;
+		vin-supply = <&vcc12v_dcin>;
 	};
 
 	vcc3v3_sd_s0: regulator-vcc3v3-sd-s0 {
@@ -811,10 +784,6 @@
 			rockchip,pins = <0 RK_PD3 RK_FUNC_GPIO &pcfg_pull_up>;
 		};
 
-		typec5v_pwren: typec5v-pwren {
-			rockchip,pins = <4 RK_PA1 RK_FUNC_GPIO &pcfg_pull_none>;
-		};
-
 		vcc5v0_peripherals_en: vcc5v0-peripherals-en {
 			rockchip,pins = <3 RK_PD5 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
@@ -1306,8 +1275,8 @@
 
 &usbdp_phy0 {
 	orientation-switch;
-	sbu1-dc-gpios = <&gpio4 RK_PA1 GPIO_ACTIVE_HIGH>;
-	sbu2-dc-gpios = <&gpio0 RK_PC1 GPIO_ACTIVE_HIGH>;
+	sbu1-dc-gpios = <&gpio4 RK_PB1 GPIO_ACTIVE_HIGH>;
+	sbu2-dc-gpios = <&gpio0 RK_PD1 GPIO_ACTIVE_HIGH>;
 	status = "okay";
 
 	port {
