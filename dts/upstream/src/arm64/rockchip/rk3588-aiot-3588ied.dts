@@ -10,7 +10,7 @@
  * references merged into a single file. The original nanopc-t6.dtsi
  * is not included.
  *
- * AIoT 3588IED Compiled By yifengyou v2026.10.07-22:26:46";
+ * AIoT 3588IED Compiled By yifengyou v2026.10.08-20:43:15";
  */
 
 /dts-v1/;
@@ -24,7 +24,7 @@
 #include "rk3588.dtsi"
 
 / {
-	model = "AIoT 3588IED Compiled By yifengyou v2026.10.07-22:26:46";
+	model = "AIoT 3588IED Compiled By yifengyou v2026.10.08-20:43:15";
 	compatible = "rockchip,rk3588-aiot-3588ied", "rockchip,rk3588";
 
 	aliases {
@@ -188,25 +188,73 @@
 		vin-supply = <&vcc_3v3_s3>;
 	};
 
+	vcc5v0_usbdcin: regulator-vcc5v0-usbdcin {
+		compatible = "regulator-fixed";
+		regulator-name = "vcc5v0_usbdcin";
+		regulator-always-on;
+		regulator-boot-on;
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		vin-supply = <&vcc12v_dcin>;
+	};
+
+	vcc5v0_peripherals: regulator-vcc5v0-peripherals {
+		compatible = "regulator-fixed";
+		regulator-name = "vcc5v0_peripherals";
+		regulator-always-on;
+		regulator-boot-on;
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		enable-active-high;
+		gpio = <&gpio3 RK_PD5 GPIO_ACTIVE_HIGH>;
+		vin-supply = <&vcc5v0_usbdcin>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&vcc5v0_peripherals_en>;
+	};
+
 	vbus5v0_typec: regulator-vbus5v0-typec {
 		compatible = "regulator-fixed";
 		enable-active-high;
+		gpio = <&gpio4 RK_PA1 GPIO_ACTIVE_HIGH>;
 		regulator-name = "vbus5v0_typec";
 		regulator-min-microvolt = <5000000>;
 		regulator-max-microvolt = <5000000>;
-		vin-supply = <&vcc5v0_sys>;
+		vin-supply = <&vcc5v0_host>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&typec5v_pwren>;
 	};
 
 	vcc5v0_host: regulator-vcc5v0-host {
 		compatible = "regulator-fixed";
-		enable-active-high;
-		gpio = <&nca9555 0 GPIO_ACTIVE_HIGH>;
+		gpio = <&nca9555 0 GPIO_ACTIVE_LOW>;
 		regulator-name = "vcc5v0_host";
 		regulator-always-on;
 		regulator-boot-on;
 		regulator-min-microvolt = <5000000>;
 		regulator-max-microvolt = <5000000>;
-		vin-supply = <&vcc5v0_sys>;
+		vin-supply = <&vcc5v0_peripherals>;
+	};
+
+	vcc5v0_usb1: regulator-vcc5v0-usb1 {
+		compatible = "regulator-fixed";
+		gpio = <&nca9555 7 GPIO_ACTIVE_LOW>;
+		regulator-name = "vcc5v0_usb1";
+		regulator-always-on;
+		regulator-boot-on;
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		vin-supply = <&vcc5v0_peripherals>;
+	};
+
+	vcc5v0_usb2: regulator-vcc5v0-usb2 {
+		compatible = "regulator-fixed";
+		gpio = <&nca9555 1 GPIO_ACTIVE_LOW>;
+		regulator-name = "vcc5v0_usb2";
+		regulator-always-on;
+		regulator-boot-on;
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		vin-supply = <&vcc5v0_peripherals>;
 	};
 
 	vcc3v3_pcie30: regulator-vcc3v3-pcie30 {
@@ -484,6 +532,7 @@
 		reg = <0x20>;
 		gpio-controller;
 		#gpio-cells = <2>;
+		vcc-supply = <&vcc_3v3_s0>;
 		status = "okay";
 	};
 
@@ -760,6 +809,24 @@
 	usb {
 		usbc0_int: usbc0-int {
 			rockchip,pins = <0 RK_PD3 RK_FUNC_GPIO &pcfg_pull_up>;
+		};
+
+		typec5v_pwren: typec5v-pwren {
+			rockchip,pins = <4 RK_PA1 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+
+		vcc5v0_peripherals_en: vcc5v0-peripherals-en {
+			rockchip,pins = <3 RK_PD5 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+	};
+
+	smdtio {
+		smdtio_gpio: smdtio-gpio {
+			rockchip,pins = <1 RK_PD6 RK_FUNC_GPIO &pcfg_pull_up>,
+					<1 RK_PB0 RK_FUNC_GPIO &pcfg_pull_up>,
+					<1 RK_PD5 RK_FUNC_GPIO &pcfg_pull_up>,
+					<1 RK_PD4 RK_FUNC_GPIO &pcfg_pull_up>,
+					<4 RK_PA2 RK_FUNC_GPIO &pcfg_pull_up>;
 		};
 	};
 

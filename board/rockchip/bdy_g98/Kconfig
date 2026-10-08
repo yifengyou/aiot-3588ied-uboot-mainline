@@ -1,12 +1,12 @@
-if TARGET_TARGET_BDY_G98_RK3588
+if TARGET_BDY_G98_RK3588
 
 config SYS_BOARD
-	default "bdy-g98-rk3588"
+	default "bdy_g98"
 
 config SYS_VENDOR
 	default "rockchip"
 
 config SYS_CONFIG_NAME
-	default "bdy-g98-rk3588"
+	default "rk3588_common"
 
 endif
