@@ -85,7 +85,7 @@
  */
 #define I2C_OP_RETRIES		5
 #define I2C_OP_RETRY_DELAY_MS	10
-#define INIT_MAX_RETRIES	200
+#define INIT_MAX_RETRIES	10
 #define INIT_RETRY_DELAY_MS	100
 
 static int nca9555_read(struct udevice *dev, u8 reg, u8 *val)
